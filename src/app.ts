@@ -24,7 +24,7 @@ app.use(express.json({limit: '30KB'}));
 app.use(mongoSanitize());
 
 //6) Routes
-app.use('/auth', authRouter);
+app.use('/api/v1/auth', authRouter);
 
 //7) Erroe Handler
 app.use(errorController);

@@ -11,7 +11,12 @@ interface IUser extends Document {
     role?: 'admin' | 'user';
     cartID?: string;
     phoneNumber?: number;
+    passwordChangedAt?: Date;
+    passwordResetToken?: String;
+    passwordResetExpires?: Date;
     isModified(path: string): boolean; // Define isModified for TypeScript
+    createResetToken(): string;
+    save(options: object): any;
   }
 
   export default IUser;
