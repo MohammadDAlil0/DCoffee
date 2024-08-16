@@ -1,4 +1,4 @@
-import IError from "../interfaces/ErrorInterface";
+import IError from "../express/ErrorInterface";
 
 class AppError extends Error implements IError {
     statusCode: number;
