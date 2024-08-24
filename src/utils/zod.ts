@@ -5,11 +5,13 @@ const validate =
   (schema: AnyZodObject) =>
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      schema.parse({
+      const parsaedData = schema.parse({
         body: req.body,
         query: req.query,
         params: req.params,
       });
+      if (parsaedData.body)
+        req.body = parsaedData.body;
       return next();
     } catch (e: any) {
       return next(e);

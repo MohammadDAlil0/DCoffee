@@ -9,9 +9,11 @@ import AppError from '../../utils/appError';
 import resetPasswordEmail from '../../public/forgotPassword';
 import sendMail from '../../utils/sendMail'
 import crypto from 'crypto';
+import Cart from '../cart/cartModel';
+import { ICart } from '../cart/cartSchema';
 
 const createSendToken = (user: IUser, statusCode: number, res: Response) => {
-    const token: String = jwt.sign({id: user.id}, process.env.JWT_SECRET!, {
+    const token: string = jwt.sign({id: user.id}, process.env.JWT_SECRET!, {
         expiresIn: process.env.JWT_EXPIRE_IN
     });
     
@@ -28,6 +30,9 @@ const createSendToken = (user: IUser, statusCode: number, res: Response) => {
 
 const signup = catchAsync(async (req: IRequest, res: Response, next: NextFunction) => {
     const user: IUser = await User.create(req.body);
+    const cart: ICart = await Cart.create({userId: user.id});
+    user.cartId = cart.id;
+    await user.save({runValidator: false});
     createSendToken(user, 201, res);
 });
 

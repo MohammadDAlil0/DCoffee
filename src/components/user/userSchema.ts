@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongoose';
+import { ObjectId } from 'mongodb';
 import {z} from 'zod';
 
 export interface IUser extends Document {
@@ -10,7 +10,7 @@ export interface IUser extends Document {
     photo?: string;
     address?: string;
     role?: 'admin' | 'user';
-    cartID?: string;
+    cartId?: ObjectId;
     phoneNumber?: number;
     passwordChangedAt?: Date;
     passwordResetToken?: String;
@@ -19,6 +19,18 @@ export interface IUser extends Document {
     createResetToken(): string;
     save(options: object): any;
 }
+
+export const zodValidateID = z.object({
+  params: z.object({
+      id: z
+      .string()
+      .refine((val) => {
+          return ObjectId.isValid(val);
+      }, {
+          message: 'Invalid ObjectID'
+      })
+  })
+});
 
 export const zodSignup = z.object({
   body: z.object({
@@ -34,8 +46,8 @@ export const zodSignup = z.object({
         invalid_type_error: 'The email must be a string',
         required_error: 'A user must have a email'
       })
-      .email()
       .trim()
+      .email()
       .toLowerCase(),
     password: z.
       string({
@@ -47,7 +59,8 @@ export const zodSignup = z.object({
       string({
         required_error: 'A user must have a password'
       })
-      .trim()
+      .trim(),
+      role: z.string()
   })
   .strict('Your request body must have just the following inputs: [name, email, password, confirmPassword]')
   .refine((data) => data.password == data.confirmPassword, {
@@ -61,13 +74,15 @@ export const zodLogin = z.object({
     email: z.
       string({
         invalid_type_error: 'The email must be a string',
+        required_error: 'Please, Enter your email'
       })
-      .email()
       .trim()
+      .email()
       .toLowerCase(),
     password: z.
       string({
-        invalid_type_error: 'The password must be a string'
+        invalid_type_error: 'The password must be a string',
+        required_error: 'Please, Enter your password'
       })
       .trim()
       .min(8, 'A password must be more than 8 characters')
@@ -79,12 +94,14 @@ export const zodForgotPassword = z.object({
   body: z.object({
     email: z.
       string({
-        invalid_type_error: 'The email must be a string'
+        invalid_type_error: 'The email must be a string',
+        required_error: 'Please, Enter your email'
       })
-      .email()
       .trim()
+      .email()
       .toLowerCase()
   })
+  .strict('Your request body must have just the following inputs: [email]')
 });
 
 export const zodUpdateMe = z.object({
@@ -94,22 +111,27 @@ export const zodUpdateMe = z.object({
         invalid_type_error: 'The name must be a string'
       })
       .trim()
-      .toLowerCase(),
-    email: z.
-      string({
-        invalid_type_error: 'The email must be a string'
-      })
-      .email()
-      .trim()
-      .toLowerCase(),
+      .toLowerCase()
+      .optional(),
     adress: z.
       string({
         invalid_type_error: 'The adress must be a string'
       })
-      .trim(),
+      .trim()
+      .optional(),
     phoneNumber: z.
       number({
         invalid_type_error: 'The phoneNumber must be a number'
       })
+      .optional()
   })
+  .strict('Your request body may have just the following inputs: [name, email, adress, phoneNumber]')
 });
+
+export const zodChangeRole = z.object({
+  body: z.object({
+    role: z.enum(['admin', 'user'], {
+      message: "Role must be ['admin' Or 'user']"
+    })
+  })
+})

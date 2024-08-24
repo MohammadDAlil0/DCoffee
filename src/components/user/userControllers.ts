@@ -1,45 +1,29 @@
 import {Response, NextFunction} from 'express';
 import IRequest from '../../express/expressInterfaces';
 import catchAsync from "../../utils/catchAsync";
-import User from '../user/userModel';
-import {IUser} from '../user/userSchema';
+import User from './userModel';
+import {IUser} from './userSchema';
 import AppError from '../../utils/appError';
+import { deleteOne, getOne, updateOne } from '../../repositories/mainFactory';
 
-const getProfile = catchAsync(async (req: IRequest, res: Response, next: NextFunction) => {
-    res.status(200).json({
-        status: 'success',
-        data: req.user
-    });
-});
-
-const updateProfile = catchAsync(async (req: IRequest, res: Response, next: NextFunction) => {
-    const user = await User.findByIdAndUpdate(req.user?.id, req.body, {
-        runValidators: false,
-        new: true
-    });
-    res.status(200).json({
-        status: 'success',
-        data: user
-    })
-});
+const getProfile = getOne(User);
+const updateProfile = updateOne(User);
+const deleteUser = deleteOne(User);
+const getUser = getOne(User);
 
 const changeRole = catchAsync(async (req: IRequest, res: Response, next: NextFunction) => {
-    const user = await User.findByIdAndUpdate(req.body.userID, {
+    const user = await User.findByIdAndUpdate(req.params.id, {
         role: req.body.role
     },{
         runValidators: false,
         new: true
     });
+    if (!user) {
+        next(new AppError('User not found', 404));
+    }
     res.status(200).json({
         status: 'success',
         data: user
-    });
-});
-
-const deleteUser = catchAsync(async (req: IRequest, res: Response, next: NextFunction) => {
-    const user = await User.findByIdAndDelete(req.body.userID);
-    res.status(204).json({
-        status: 'success'
     });
 });
 
@@ -47,5 +31,6 @@ export default {
     getProfile,
     updateProfile,
     changeRole,
-    deleteUser
+    deleteUser,
+    getUser
 };

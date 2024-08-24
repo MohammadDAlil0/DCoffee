@@ -4,14 +4,19 @@ import {IUser} from './userSchema';
 import crypto from 'crypto'
 
 const userSchema: Schema<IUser> = new mongoose.Schema({
-    name: String,
+    name: {
+        type: String,
+        required: [true, 'A user must have a name']
+    },
     email: {
         type: String,
-        unique: true
+        unique: true,
+        required: [true, 'A user must have an email']
     },
     password: {
         type: String,
-        select: false
+        select: false,
+        required: [true, 'A user must have an password']
     },
     confirmPassword: {
         type: String,
@@ -22,10 +27,12 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
     role: {
         type: String,
         enum: ['admin', 'user'],
-        default: 'user',
-        select: false
+        default: 'user'
     },
-    cartID: String,
+    cartId: {
+        type: mongoose.Types.ObjectId,
+        ref: "Cart"
+    },
     phoneNumber: Number,
     passwordChangedAt: {
         type: Date,
@@ -44,7 +51,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
 userSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
     this.password = await bcrypt.hash(this.password, 12);
-    this.confirmPassword = this.cartID = this.phoneNumber = undefined;
+    this.confirmPassword = this.phoneNumber = undefined;
 });
 
 userSchema.methods.createResetToken = function() {
@@ -55,4 +62,4 @@ userSchema.methods.createResetToken = function() {
     return resetToken;
 }
 
-export default mongoose.model('User', userSchema);
+export default mongoose.model<IUser>('User', userSchema);
