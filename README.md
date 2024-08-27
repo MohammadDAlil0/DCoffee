@@ -27,12 +27,12 @@ Again, Make sure you have Node.js and MongoDB installed on your machine.
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/MohammadDAlil0/Dalil-Coffee
+git clone https://github.com/MohammadDAlil0/DCoffee
 ```
 2. Install dependencies:
 ```bash
-cd Dalil-Coffee
-npm install
+cd DCoffee
+yarn install
 ```
 3. Set up environment variables:
 
@@ -51,7 +51,8 @@ TEAM_NAME=Dalil-coffee
 ```
 4. Start the server:
 ```bash
-npm start
+yarn build
+yarn start
 ```
 The server should now be running on http://localhost:4000.
 
