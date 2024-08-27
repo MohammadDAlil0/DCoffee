@@ -13,19 +13,24 @@ const updateCart = updateOne(Cart);
 const deleteCart = deleteOne(Cart);
 
 const addToCart = catchAsync(async (req: IRequest, res: Response, next: NextFunction) => {
-    const product = await Product.findById(req.params.productId);
+    const product = await Product.findById(req.params.id);
     if (!product) {
-        next(new AppError('There is no such product haveing this ID', 404));
+        return next(new AppError('There is no such product haveing this ID', 404));
     }
-    await Cart.findByIdAndUpdate(req.params.id, {
-        products: {
-            $push: {
-                productId: product!._id,
+    const cart = await Cart.findByIdAndUpdate(req.user?.cartId, {
+        $push: {
+            products: {
+                productId: product._id,
                 amount: 1,
-                price: product!.price
+                price: product.price
             }
         }
+    }, {
+        new: true
     });
+    if (cart) {
+        return next(new AppError('Unable to find the cart', 500));
+    }
     res.status(200).json({
         status: 'success',
         message: 'Added to cart successfuly'
