@@ -45,7 +45,7 @@ reviewSchema.pre(/^find/, function (this: mongoose.Query<IReview, IReview>, next
 reviewSchema.statics.calcAverageRatings = async function (productId: mongoose.Types.ObjectId) {
     const stats = await this.aggregate([
         {
-            $match: { product: productId }
+            $match: { productId: productId }
         },
         {
             $group: {
@@ -58,13 +58,13 @@ reviewSchema.statics.calcAverageRatings = async function (productId: mongoose.Ty
 
     if (stats.length > 0) {
         await Product.findByIdAndUpdate(productId, {
-            ratingsQuantity: stats[0].nRating,
-            ratingsAverage: stats[0].avgRating
+            numOfVoters: stats[0].nRating,
+            rate: stats[0].avgRating
         });
     } else {
         await Product.findByIdAndUpdate(productId, {
-            ratingsQuantity: 0,
-            ratingsAverage: 4.5 // Assuming 4.5 as a default average rating
+            numOfVoters: 0,
+            rate: 4.5 // Assuming 4.5 as a default average rating
         });
     }
 };

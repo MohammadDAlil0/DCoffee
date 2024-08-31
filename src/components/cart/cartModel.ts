@@ -16,7 +16,7 @@ const cartSchema: Schema<ICart> = new mongoose.Schema({
     dateToDelivered: Date,
     products: {
         type: [{
-            productID: {
+            product: {
                 type: mongoose.Schema.ObjectId,
                 ref: 'Product'
             },

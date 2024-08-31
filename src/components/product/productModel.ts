@@ -21,10 +21,6 @@ const productSchema: Schema<IProduct> = new mongoose.Schema({
         enum: ['Drinks', 'Sweets', 'Coffee', 'Others']
     },
     tags: [String],
-    sumOfStars: {
-        type: Number,
-        default: 0
-    },
     numOfVoters: {
         type: Number,
         default: 0

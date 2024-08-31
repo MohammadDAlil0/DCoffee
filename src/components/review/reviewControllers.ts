@@ -6,7 +6,7 @@ import Review from "./reviewModel";
 
 const createReview = catchAsync(async (req: IRequest, res: Response, next: NextFunction) => {
     req.body.userId = req.user?.id;
-    let doc = await Review.findOneAndUpdate({userId: req.body.userId, productId: req.body.productId}, {
+    let doc = await Review.findOneAndUpdate({userId: req.body.userId, productId: req.params.productId}, {
         review: req.body.review,
         rating: req.body.rating
     }, {
@@ -20,13 +20,18 @@ const createReview = catchAsync(async (req: IRequest, res: Response, next: NextF
     }); 
 });
 
-const getAllReviews = getAll(Review);
-const getReview = getOne(Review);
+const getReviews = catchAsync(async (req: IRequest, res: Response, next: NextFunction) => {
+    let reviews = await Review.find({userId: req.user?.id, productId: req.params.productId});
+    res.status(201).json({
+        status: 'success',
+        result: reviews.length,
+        data: reviews
+    }); 
+});
 const deleteReview = deleteOne(Review);
 
 export default {
-    getAllReviews,
     createReview,
-    getReview,
+    getReviews,
     deleteReview
 }

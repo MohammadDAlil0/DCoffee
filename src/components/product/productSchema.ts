@@ -10,7 +10,6 @@ export interface IProduct extends Document {
     amount: number;
     category: string;
     tags: [string];
-    sumOfStars: number;
     numOfVoters: number;
     rate: number;
 };

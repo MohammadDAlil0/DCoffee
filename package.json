@@ -9,7 +9,7 @@
   "scripts": {
     "start": "yarn server",
     "build": "yarn build-ts",
-    "serve": "node dist/server.js",
+    "server": "node dist/server.js",
     "watch-node": "sleep 5 && nodemon dist/server.js",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",

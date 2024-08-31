@@ -35,16 +35,20 @@ export const zodCreateReciew = z.object({
             invalid_type_error: 'The rating must be a number'
         })
         .min(1, 'Rating must be above 1.0')
-        .max(8, 'Rating must be below 5.0'),
+        .max(8, 'Rating must be below 5.0')
+    })
+    .strict('Your request body must have just the following inputs: [review, rating]'),
+    params: z.object({
         productId: z.
-        string()
+        string({
+            required_error: 'A review must have a product ID'
+        })
         .refine((val: any) => {
             return ObjectId.isValid(val);
         }, {
             message: "Invalid ProductId"
         })
     })
-    .strict('Your request body must have just the following inputs: [review, rating]')
 });
 
 export const zodUpdateReview = z.object({

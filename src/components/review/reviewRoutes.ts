@@ -8,12 +8,10 @@ const router = express.Router({ mergeParams: true});
 
 router.use(authControllers.protect);
 
-router.route('/')
-.get(reviewControllers.getAllReviews)
-.post(validator(zodCreateReciew), reviewControllers.createReview);
+router.route('/:productId')
+.post(validator(zodCreateReciew), reviewControllers.createReview)
+.get(reviewControllers.getReviews);
 
-router.route('/:id')
-.get(reviewControllers.getReview)
-.delete(reviewControllers.deleteReview);
+router.delete('/:id', reviewControllers.deleteReview);
 
 export default router;
