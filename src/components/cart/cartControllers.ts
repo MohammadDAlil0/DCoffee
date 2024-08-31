@@ -8,8 +8,6 @@ import AppError from "../../utils/appError";
 import { IUser } from "../user/userSchema";
 
 const getAllCarts = getAll(Cart);
-const createCart = createOne(Cart);
-const deleteCart = deleteOne(Cart);
 
 const addToCart = catchAsync(async (req: IRequest, res: Response, next: NextFunction) => {
     const product = await Product.findById(req.params.id);
@@ -39,7 +37,7 @@ const addToCart = catchAsync(async (req: IRequest, res: Response, next: NextFunc
 const getCart = catchAsync(async (req: IRequest, res: Response, next: NextFunction) => {
     const cart = await Cart.findOne({_id: req.user?.cartId, status: 'cart'}).populate('products.product');
     if (!cart) {
-        return next(new AppError('The cart not found', 404));
+        return next(new AppError('The cart is not found', 404));
     }
     res.status(200).json({
         status: 'success',
@@ -53,7 +51,7 @@ const updateCart = catchAsync(async (req: IRequest, res: Response, next: NextFun
         runValidators: true
     });
     if (!cart) {
-        return next(new AppError('The cart not found', 404));
+        return next(new AppError('The cart is not found', 404));
     }
     res.status(200).json({
         status: 'success',
@@ -71,7 +69,7 @@ const buyCart = catchAsync(async (req: IRequest, res: Response, next: NextFuncti
     });
 
     if (!cart) {
-        next(new AppError('The cart not found', 404));
+        next(new AppError('The cart is not found', 404));
     }
     
     const curUser: IUser = req.user!;
@@ -90,12 +88,15 @@ const acceptCart = catchAsync(async (req: IRequest, res: Response, next: NextFun
     const cart = await Cart.findOneAndUpdate({_id: req.params.id, status: 'On-Going'}, {
         $set: {
             status: 'On-Way',
-            dateToDelivered: req.body.dataToDelivered
+            dateToDelivered: new Date(req.body.dataToDelivered)
         }
+    }, {
+        new: true
     });
+    console.log(cart);
 
     if (!cart) {
-        next(new AppError('Invalid cart ID', 404));
+        next(new AppError('The cart is not found', 404));
     }
 
     res.status(200).json({
@@ -104,18 +105,18 @@ const acceptCart = catchAsync(async (req: IRequest, res: Response, next: NextFun
     });
 });
 
-
-//Working on ...
 const cancelCart = catchAsync(async (req: IRequest, res: Response, next: NextFunction) => {
     const cart = await Cart.findByIdAndUpdate(req.params.id, {
         $set: {
             status: 'rejected',
             reason: req.body.reason
         }
+    }, {
+        new: true
     });
 
     if (!cart) {
-        next(new AppError('Invalid cart ID', 404));
+        next(new AppError('The cart is not found', 404));
     }
 
     res.status(200).json({
@@ -125,29 +126,29 @@ const cancelCart = catchAsync(async (req: IRequest, res: Response, next: NextFun
 });
 
 const deliveredCart = catchAsync(async (req: IRequest, res: Response, next: NextFunction) => {
-    const cart = await Cart.findByIdAndUpdate(req.params.id, {
+    const cart = await Cart.findOneAndUpdate({_id: req.params.id, status: 'On-Way'}, {
         $set: {
             status: 'delivered',
             deliverdTime: Date.now()
         }
+    }, {
+        new: true
     });
 
     if (!cart) {
-        next(new AppError('Invalid cart ID', 404));
+        next(new AppError('The cart is not found', 404));
     }
 
     res.status(200).json({
         status: 'success',
-        message: `Your cart has been rejected, reason: ${cart?.reason}`
+        message: `The order delivered at ${cart?.deliverdTime}`
     });
 });
 
 export default {
     getAllCarts,
-    createCart,
     getCart,
     updateCart,
-    deleteCart,
     addToCart,
     buyCart,
     acceptCart,

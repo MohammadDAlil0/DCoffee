@@ -14,9 +14,10 @@ router.route('/cart')
 .patch(validator(zodUpdateCart),cartControllers.updateCart)
 .post(cartControllers.buyCart);
 
-router.use('/admin', authControllers.restrictAdmin);
-router.put('/acceptCart/:id', cartControllers.acceptCart);
-router.put('/canelCart/:id', cartControllers.cancelCart);
-router.put('/delivered/:id', cartControllers.deliveredCart);
+router.use(authControllers.restrictAdmin);
+router.put('/admin/acceptCart/:id', cartControllers.acceptCart);
+router.put('/admin/cancelCart/:id', cartControllers.cancelCart);
+router.put('/admin/delivered/:id', cartControllers.deliveredCart);
+router.get('/admin/getAllCarts', cartControllers.getAllCarts);
 
 export default router;
